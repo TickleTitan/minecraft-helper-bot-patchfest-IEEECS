@@ -25,6 +25,7 @@ Current version includes:
 - `.hello` command for testing functionality
 
 ---
+### REFER TO THE DOCS : https://github.com/PrismarineJS/mineflayer/blob/master/docs/README.md
 
 ## 🚀 Getting Started
 

@@ -1,13 +1,17 @@
 // minecraft-helper-bot / index.js
-// PatchFest bot – modular version
+// PatchFest bot – modular version (mine area + replay)
 
 require('dotenv').config();
 const mineflayer = require('mineflayer');
 const path = require('path');
 const fs = require('fs');
-const { pathfinder, Movements, goals } = require('mineflayer-pathfinder'); // movement
-const { log } = require('./utils/logger');      // utils/logger.js
-const { parseCommand } = require('./utils/parser'); // utils/parser.js
+const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
+
+const { log } = require('./utils/logger');
+const { parseCommand } = require('./utils/parser');
+const { Recorder } = require('./utils/recorder');
+
+const recorder = new Recorder(log);
 
 const commands = {};
 
@@ -30,8 +34,8 @@ function loadCommandsFrom(dir) {
 }
 
 // load all command modules
-loadCommandsFrom('commands');   // hello, help, say, coords, etc.
-loadCommandsFrom('movement');   // come, follow, stop
+loadCommandsFrom('commands');   // hello, help, say, coords, record, ai, ...
+loadCommandsFrom('movement');   // come, follow, stop, mine
 loadCommandsFrom('inventory');  // listitems, throwall, equip
 
 const bot = mineflayer.createBot({
@@ -40,31 +44,32 @@ const bot = mineflayer.createBot({
   username: process.env.MC_USERNAME || 'PatchFestBot'
 });
 
-bot.loadPlugin(pathfinder); // enable pathfinder movement [web:149]
+bot.loadPlugin(pathfinder);
 
 bot.once('spawn', () => {
   log(`Bot spawned as "${bot.username}"`);
-
   bot.chat('Hello everyone! The helper bot has joined the server 🎉');
 
-  // configure default pathfinder movements
-  const mcData = require('minecraft-data')(bot.version); // [web:103]
+  const mcData = require('minecraft-data')(bot.version);
   const defaultMove = new Movements(bot, mcData);
   bot.pathfinder.setMovements(defaultMove);
 });
 
 bot.on('chat', (username, message) => {
+  // record incoming chat for replay context
+  recorder.record('chat', { username, message });
+
   if (username === bot.username) return;
 
   const parsed = parseCommand(message);
-  if (!parsed) return; // not a command (no leading ".")
+  if (!parsed) return;
 
   const { name: commandName, args } = parsed;
   const cmd = commands[commandName];
-  if (!cmd) return; // unknown command → ignore silently
+  if (!cmd) return;
 
   try {
-    cmd.execute(bot, username, args, { log, goals });
+    cmd.execute(bot, username, args, { log, goals, recorder });
   } catch (err) {
     log(`Error in command .${commandName}: ${err.stack}`);
     bot.chat(`@${username} Unexpected error running .${commandName}`);

@@ -32,8 +32,8 @@ bot.on("chat", (username, message) => {
     bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>");
   }
   
-  //added .coords command
-  if (message === ".coords") {
+  //added .coords command and .whereami alias
+  if (message === ".coords" || message === ".whereami") {
     const pos = bot.entity.position;
     const x = Math.round(pos.x);
     const y = Math.round(pos.y);

@@ -109,4 +109,18 @@ bot.on("chat", (username, message) => {
     bot.chat(`@${username} Stopped current actions (as far as I can).`);
     return;
   }
+
+    if (commandName === "listitems" || commandName === "items") {
+    const items = bot.inventory.items();
+    if (!items.length) {
+      bot.chat(`@${username} My inventory is empty.`);
+      return;
+    }
+    const summary = items
+      .map(i => `${i.count}x ${i.displayName}`)
+      .join(", ");
+    bot.chat(`@${username} I currently have: ${summary}`);
+    return;
+  }
+
 });

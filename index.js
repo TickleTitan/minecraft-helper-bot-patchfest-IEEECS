@@ -81,7 +81,7 @@ bot.on("chat", (username, message) => {
   }
 
   if (commandName === "help") {
-    bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>, .ping");
+    bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>, .ping, .stop");
     return;
   }
 
@@ -100,6 +100,13 @@ bot.on("chat", (username, message) => {
       return;
     }
     bot.chat(args.join(" "));
+    return;
+  }
+
+  if (commandName === "stop") {
+    // Basic stop: clear keyboard controls
+    if (bot.clearControlStates) bot.clearControlStates();
+    bot.chat(`@${username} Stopped current actions (as far as I can).`);
     return;
   }
 });

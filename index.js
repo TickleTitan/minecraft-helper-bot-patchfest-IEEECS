@@ -12,8 +12,10 @@ const bot = mineflayer.createBot({
 });
 
 // Bot events
-bot.once("spawn", () => {
-  console.log("🤖 Bot successfully spawned into the world!");
+bot.once('spawn', () => {
+  console.log(`🤖 Bot successfully spawned into the world as "${bot.username}"!`);
+  // join message to users
+  bot.chat('Hello everyone! The helper bot has joined the server 🎉');
 });
 
 // Basic chat command listener
@@ -24,4 +26,6 @@ bot.on("chat", (username, message) => {
   if (message === ".hello") {
     bot.chat(`Hello ${username}! I am your helper bot 🤝`);
   }
+
+  
 });

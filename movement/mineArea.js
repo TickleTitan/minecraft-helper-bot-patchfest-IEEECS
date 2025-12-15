@@ -1,31 +1,42 @@
 // movement/mineArea.js
+// .mine area <radius> – area mining with basic tool requirements
+
+const { ensureToolEquipped } = require('../inventory/toolLogic');
+
 module.exports = {
   name: "mine",
   aliases: [],
-  async execute(bot, username, args, { log, goals }) {
-    if (args[0] !== "area" || args.length !== 2) {
+  async execute(bot, username, args, { log }) {
+    // Expect: .mine area <radius>
+    if (args.length !== 2 || args[0] !== "area") {
       bot.chat(`@${username} Usage: .mine area <radius>`);
       return;
     }
+
     const radius = Number(args[1]);
     if (!Number.isFinite(radius) || radius <= 0 || radius > 10) {
-      bot.chat(`@${username} Radius must be between 1 and 10.`);
+      bot.chat(`@${username} Radius must be a number between 1 and 10.`);
       return;
     }
 
     const center = bot.entity.position.clone();
-    bot.chat(`@${username} Mining area around me with radius ${radius}...`);
+    bot.chat(`@${username} Mining around me with radius ${radius}...`);
 
-    // Very naive scan: iterate in a cube, you will optimize later
-    for (let x = -radius; x <= radius; x++) {
-      for (let y = -radius; y <= radius; y++) {
-        for (let z = -radius; z <= radius; z++) {
-          const pos = center.offset(x, y, z);
+    // Very simple cube scan – can be optimized later
+    for (let dx = -radius; dx <= radius; dx++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dz = -radius; dz <= radius; dz++) {
+          const pos = center.offset(dx, dy, dz);
           const block = bot.blockAt(pos);
           if (!block) continue;
           if (!block.diggable) continue;
-          // basic safety: never mine bedrock/air/lava etc.
+
+          // Safety: skip dangerous or useless blocks
           if (["bedrock", "air", "lava", "water"].includes(block.name)) continue;
+
+          // Tool requirement logic (Issue 23)
+          const ok = await ensureToolEquipped(bot, block, log);
+          if (!ok) continue;
 
           try {
             await bot.dig(block);

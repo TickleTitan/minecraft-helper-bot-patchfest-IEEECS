@@ -44,14 +44,24 @@ bot.once('spawn', () => {
   bot.chat('Hello everyone! The helper bot has joined the server 🎉');
 });
 
+function parseCommand(message) {
+  if (!message.startsWith(".")) return null;
+  const parts = message.trim().split(/\s+/);
+  if (parts.length === 0) return null;
+  const name = parts[0].slice(1).toLowerCase(); // remove "."
+  const args = parts.slice(1);
+  return { name, args };
+}
+
+
 // Basic chat command listener
 bot.on("chat", (username, message) => {
   if (username === bot.username) return;
-  if (!message.startsWith(".")) return;
+  
+  const parsed = parseCommand(message);
+  if (!parsed) return;
 
-  const parts = message.trim().split(/\s+/);
-  const commandName = parts[0].slice(1).toLowerCase(); // remove leading '.'
-  const args = parts.slice(1);
+  const { name: commandName, args } = parsed;
 
   // 1) dynamic commands from /commands
   if (commands[commandName]) {

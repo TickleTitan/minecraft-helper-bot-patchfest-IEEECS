@@ -27,5 +27,8 @@ bot.on("chat", (username, message) => {
     bot.chat(`Hello ${username}! I am your helper bot 🤝`);
   }
 
-  
+  //added .help command
+  if (message === ".help") {
+    bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>");
+  }  
 });

@@ -1,5 +1,8 @@
 // minecraft-helper-bot / index.js
 // Minimal PatchFest Starter Bot
+const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
+bot.loadPlugin(pathfinder);
+
 const path = require("path");
 const fs = require("fs");
 
@@ -42,6 +45,10 @@ bot.once('spawn', () => {
   log(`🤖 Bot successfully spawned into the world as "${bot.username}"!`);
   // join message to users
   bot.chat('Hello everyone! The helper bot has joined the server 🎉');
+
+  const mcData = require('minecraft-data')(bot.version);
+  const defaultMove = new Movements(bot, mcData);
+  bot.pathfinder.setMovements(defaultMove);
 });
 
 function parseCommand(message) {
@@ -103,12 +110,13 @@ bot.on("chat", (username, message) => {
     return;
   }
 
-  if (commandName === "stop") {
-    // Basic stop: clear keyboard controls
+    if (commandName === "stop") {
     if (bot.clearControlStates) bot.clearControlStates();
-    bot.chat(`@${username} Stopped current actions (as far as I can).`);
+    if (bot.pathfinder) bot.pathfinder.setGoal(null);
+    bot.chat(`@${username} Stopped current actions.`);
     return;
   }
+
 
     if (commandName === "listitems" || commandName === "items") {
     const items = bot.inventory.items();
@@ -173,6 +181,29 @@ bot.on("chat", (username, message) => {
     });
     return;
   }
+  
+    if (commandName === "come") {
+    if (args.length !== 3) {
+      bot.chat(`@${username} Usage: .come <x> <y> <z>`);
+      return;
+    }
 
+    const [xStr, yStr, zStr] = args;
+    const x = Number(xStr);
+    const y = Number(yStr);
+    const z = Number(zStr);
+
+    if ([x, y, z].some(n => Number.isNaN(n))) {
+      bot.chat(`@${username} Coordinates must be numbers.`);
+      return;
+    }
+
+    const goal = new goals.GoalBlock(x, y, z);
+    bot.chat(`@${username} On my way to ${x} ${y} ${z}...`);
+    bot.pathfinder.setGoal(goal);
+    return;
+  }
+
+  
 
 });

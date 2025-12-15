@@ -8,10 +8,8 @@ const fs = require("fs");
 
 const commands = {};
 
-function log(message) {
-  const ts = new Date().toISOString();
-  console.log(`[${ts}] ${message}`);
-}
+const { log } = require('./lib/logger');
+const { parseCommand } = require('./lib/parser');
 
 // Load commands dynamically if folder exists
 const commandsPath = path.join(__dirname, "commands");
@@ -50,16 +48,6 @@ bot.once('spawn', () => {
   const defaultMove = new Movements(bot, mcData);
   bot.pathfinder.setMovements(defaultMove);
 });
-
-function parseCommand(message) {
-  if (!message.startsWith(".")) return null;
-  const parts = message.trim().split(/\s+/);
-  if (parts.length === 0) return null;
-  const name = parts[0].slice(1).toLowerCase(); // remove "."
-  const args = parts.slice(1);
-  return { name, args };
-}
-
 
 // Basic chat command listener
 bot.on("chat", (username, message) => {

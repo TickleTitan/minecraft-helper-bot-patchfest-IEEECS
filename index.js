@@ -123,4 +123,56 @@ bot.on("chat", (username, message) => {
     return;
   }
 
+    if (commandName === "throwall") {
+    if (args[0] !== "confirm") {
+      bot.chat(`@${username} This will drop ALL items. Use ".throwall confirm" to proceed.`);
+      return;
+    }
+    const items = bot.inventory.items();
+    if (!items.length) {
+      bot.chat(`@${username} Nothing to drop.`);
+      return;
+    }
+
+    // Drop sequentially
+    (async () => {
+      for (const item of items) {
+        try {
+          await bot.tossStack(item);
+        } catch (err) {
+          log(`Error dropping ${item.displayName}: ${err.message}`);
+        }
+      }
+      bot.chat(`@${username} Dropped all items.`);
+    })();
+
+    return;
+  }
+
+    if (commandName === "equip") {
+    if (args.length === 0) {
+      bot.chat(`@${username} Usage: .equip <item-name>`);
+      return;
+    }
+    const query = args.join(" ").toLowerCase();
+    const item = bot.inventory.items().find(
+      i => i.displayName.toLowerCase().includes(query)
+    );
+    if (!item) {
+      bot.chat(`@${username} I don't have any item matching "${query}".`);
+      return;
+    }
+
+    bot.equip(item, "hand", err => {
+      if (err) {
+        log(`Equip error: ${err.message}`);
+        bot.chat(`@${username} Failed to equip ${item.displayName}.`);
+        return;
+      }
+      bot.chat(`@${username} Equipped ${item.displayName} in hand.`);
+    });
+    return;
+  }
+
+
 });

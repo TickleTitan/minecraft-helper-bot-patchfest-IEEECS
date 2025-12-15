@@ -1,14 +1,14 @@
 // minecraft-helper-bot / index.js
 // Minimal PatchFest Starter Bot
-function log(message) {
-  const ts = new Date().toISOString();
-  console.log(`[${ts}] ${message}`);
-}
-
 const path = require("path");
 const fs = require("fs");
 
 const commands = {};
+
+function log(message) {
+  const ts = new Date().toISOString();
+  console.log(`[${ts}] ${message}`);
+}
 
 // Load commands dynamically if folder exists
 const commandsPath = path.join(__dirname, "commands");

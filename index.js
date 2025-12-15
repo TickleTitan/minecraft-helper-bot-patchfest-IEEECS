@@ -30,5 +30,15 @@ bot.on("chat", (username, message) => {
   //added .help command
   if (message === ".help") {
     bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>");
-  }  
+  }
+  
+  //added .coords command
+  if (message === ".coords") {
+    const pos = bot.entity.position;
+    const x = Math.round(pos.x);
+    const y = Math.round(pos.y);
+    const z = Math.round(pos.z);
+    bot.chat(`@${username} I am currently at X:${x} Y:${y} Z:${z}`);
+    return;
+  }
 });

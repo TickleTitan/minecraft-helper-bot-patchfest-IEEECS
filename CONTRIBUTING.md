@@ -1,53 +1,23 @@
-# Contributing to Minecraft Helper Bot
+# Contributing to minecraft-helper-bot
 
-Thank you for your interest in contributing! 🎉  
-This project is part of the PatchFest open source contribution sprint.
+Thanks for your interest in contributing!
 
----
+## Getting started
+- Fork this repository and clone your fork.
+- Run `npm install` to install dependencies.
+- Create a test Minecraft server and set `MC_HOST`, `MC_PORT`, `MC_USERNAME` in a `.env` file.
 
-## 🧾 How to Contribute
+## How to contribute
+- Check the open issues tagged `easy` or `good first issue`.
+- Create a feature branch: `git checkout -b feature/my-change`.
+- Make your changes (add or update commands in `index.js` or `commands/`).
+- Run `node index.js` and test the bot connects and commands work.
 
-### 1. Choose an Issue
-Check the Issues tab and comment `I would like to work on this` to claim it.
+## Coding style
+- Use modern JavaScript (const/let, arrow functions).
+- Keep commands small and focused, one file per command in `commands/`.
 
-### 2. Create a Branch
-Use the format:
-feature/<issue-number>-<short-name>
-
-Example:
-feature/12-follow-command
-
-### 3. Submit a Pull Request
-When finished, submit a PR with:
-• Summary of what you implemented  
-• Screenshots / logs if needed  
-• Mention the issue: `Closes #12`
-
----
-
-## Code Style & Rules
-• Keep code modular and clean  
-• Do not commit `.env` or private configs  
-• Avoid pushing broken or unstable builds  
-• Use clear and descriptive commit messages
-
-Suggested format:
-type(scope): description
-
-Examples:
-- feat(movement): add follow command
-- fix(inventory): resolve null crash in throwall
-- docs: add contributing guidelines
-
----
-
-## PR Review Process
-1. Repository maintainer reviews and comments
-2. Requested changes are applied (if any)
-3. PR is approved and merged 🎉
-
----
-
-## Need Help?
-Ask questions in the Issue discussion thread.
-Be respectful, helpful & collaborative.
+## Opening a pull request
+- Push your branch and open a PR.
+- Describe what you changed and how to test it.
+- Link any related issue (e.g. `Closes #5`).

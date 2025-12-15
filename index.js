@@ -1,5 +1,10 @@
 // minecraft-helper-bot / index.js
 // Minimal PatchFest Starter Bot
+function log(message) {
+  const ts = new Date().toISOString();
+  console.log(`[${ts}] ${message}`);
+}
+
 const path = require("path");
 const fs = require("fs");
 
@@ -34,7 +39,7 @@ const bot = mineflayer.createBot({
 
 // Bot events
 bot.once('spawn', () => {
-  console.log(`🤖 Bot successfully spawned into the world as "${bot.username}"!`);
+  log(`🤖 Bot successfully spawned into the world as "${bot.username}"!`);
   // join message to users
   bot.chat('Hello everyone! The helper bot has joined the server 🎉');
 });
@@ -53,7 +58,7 @@ bot.on("chat", (username, message) => {
     try {
       commands[commandName].execute(bot, username, args);
     } catch (err) {
-      console.error(err);
+      log(`Error executing command ${commandName}: ${err.message}`);
       bot.chat(`@${username} Something went wrong running that command.`);
     }
     return;

@@ -41,4 +41,15 @@ bot.on("chat", (username, message) => {
     bot.chat(`@${username} I am currently at X:${x} Y:${y} Z:${z}`);
     return;
   }
+
+  //added .say command
+  if (command === ".say") {
+    if (args.length === 0) {
+      bot.chat(`@${username} Usage: .say <message>`);
+      return;
+    }
+    const repeat = args.join(" ");
+    bot.chat(repeat);
+    return;
+  }
 });

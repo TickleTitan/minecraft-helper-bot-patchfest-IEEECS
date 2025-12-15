@@ -1,5 +1,26 @@
 // minecraft-helper-bot / index.js
 // Minimal PatchFest Starter Bot
+const path = require("path");
+const fs = require("fs");
+
+const commands = {};
+
+// Load commands dynamically if folder exists
+const commandsPath = path.join(__dirname, "commands");
+if (fs.existsSync(commandsPath)) {
+  const files = fs.readdirSync(commandsPath).filter(f => f.endsWith(".js"));
+  for (const file of files) {
+    const cmd = require(path.join(commandsPath, file));
+    if (!cmd || !cmd.name || typeof cmd.execute !== "function") continue;
+
+    commands[cmd.name] = cmd;
+    if (Array.isArray(cmd.aliases)) {
+      for (const alias of cmd.aliases) {
+        commands[alias] = cmd;
+      }
+    }
+  }
+}
 
 require('dotenv').config();
 const mineflayer = require('mineflayer');
@@ -20,21 +41,37 @@ bot.once('spawn', () => {
 
 // Basic chat command listener
 bot.on("chat", (username, message) => {
+  if (username === bot.username) return;
+  if (!message.startsWith(".")) return;
 
-  if (username === bot.username) return; // ignore itself
+  const parts = message.trim().split(/\s+/);
+  const commandName = parts[0].slice(1).toLowerCase(); // remove leading '.'
+  const args = parts.slice(1);
 
-  if (message === ".hello") {
+  // 1) dynamic commands from /commands
+  if (commands[commandName]) {
+    try {
+      commands[commandName].execute(bot, username, args);
+    } catch (err) {
+      console.error(err);
+      bot.chat(`@${username} Something went wrong running that command.`);
+    }
+    return;
+  }
+
+  // 2) built‑in commands in this file
+  if (commandName === "hello") {
     bot.chat(`Hello ${username}! I am your helper bot 🤝`);
+    return;
   }
 
-  //added .help command
-  if (message === ".help") {
-    bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>");
+  if (commandName === "help") {
+    bot.chat("Commands: .hello, .help, .coords / .whereami, .say <message>, .ping");
+    return;
   }
-  
-  //added .coords command and .whereami alias
-  if (message === ".coords" || message === ".whereami") {
-    const pos = bot.entity.position;
+
+  if (commandName === "coords" || commandName === "whereami") {
+    const pos = bot.entity.position;              // current bot position [web:100]
     const x = Math.round(pos.x);
     const y = Math.round(pos.y);
     const z = Math.round(pos.z);
@@ -42,14 +79,12 @@ bot.on("chat", (username, message) => {
     return;
   }
 
-  //added .say command
-  if (command === ".say") {
+  if (commandName === "say") {
     if (args.length === 0) {
       bot.chat(`@${username} Usage: .say <message>`);
       return;
     }
-    const repeat = args.join(" ");
-    bot.chat(repeat);
+    bot.chat(args.join(" "));
     return;
   }
 });
